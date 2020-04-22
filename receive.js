@@ -1,89 +1,112 @@
-// module.exports = function (RED) {
-//     'use strict'
+module.exports = function (RED) {
+    'use strict'
   
-//     const { create } = require('sulla')
+    function WhatsappBotReceive (config) {
+      RED.nodes.createNode(this, config)
   
-//     const RETRY_TIMEOUT = 10000
+      const node = this
+      node.name = config.name
   
-//     const EVENTS = [
-//       'onMessage',
-//       'onAck',
-//       'onAddedToGroup'
-//     ]
+      const SOCKETS_STATE = {
+        OPENING: 'info',
+        PAIRING: 'info',
+        UNPAIRED: 'info',
+        UNPAIRED_IDLE: 'info',
+        CONNECTED: 'success',
+        TIMEOUT: 'error',
+        CONFLICT: 'error',
+        UNLAUNCHED: 'error',
+        PROXYBLOCK: 'error',
+        TOS_BLOCK: 'error',
+        SMB_TOS_BLOCK: 'error',
+        DEPRECATED_VERSION: 'error'
+      }
   
-//     function WhatsappClientReceive (config) {
-//       RED.nodes.createNode(this, config)
-//       const node = this
+      const clientNode = RED.nodes.getNode(config.client)
   
-//       var client = null
+      function registerEvents () {
+        clientNode.on('stateChange', onStateChange.bind(node))
+        clientNode.on('clientEvent', onClientEvent.bind(node))
+      }
   
-//       function registerEvents () {
-//         for (const event of EVENTS) {
-//           client[event](onEvent.bind(node, event))
-//         }
-//       }
+      function onStateChange (socketState) {
+        setStatus(SOCKETS_STATE[socketState], 'Socket: ' + socketState)
+      }
   
-//       function onEvent (eventName, ...args) {
-//         node.emit('clientEvent', eventName, ...args)
-//       }
+      function onClientEvent (eventName, ...args) {
+        node.send([{ topic: eventName, payload: args }, null])
+      }
   
-//       function onQrCode (qrCode) {
-//         node.emit('qrCode', qrCode)
-//       }
+      function onChatEvent (event, chatId, ...args) {
+        node.send([{ topic: event, chatId: chatId, args: args }, null])
+      }
   
-//       async function startClient () {
-//         client = await create(config.session, onQrCode, {
-//           headless: config.headless,
-//           devtools: config.devtools
-//         })
+      if (clientNode) {
+        clientNode.register(node)
   
-//         client.onStateChange((state) => {
-//           if (state === 'UNLAUNCHED') {
-//             client.useHere()
-//           }
+        setStatus('warning', 'Authenticating...')
   
-//           node.emit('stateChange', state)
-//         })
+        clientNode.on('qrCode', function (qrCode) {
+          node.send([null, { topic: 'qrCode', payload: [qrCode] }])
+        })
   
-//         registerEvents()
-//         node.emit('ready', client)
-//       }
+        clientNode.on('ready', function (client) {
+          setStatus('success', 'Connected')
   
-//       node.on('close', function (done) {
-//         if (client) {
-//           client.close
-//             .catch((err) => {
-//               node.error('Error while closing Whatsapp client "' + config.session + '": ' + err.message)
-//             }).finally(() => done())
-//         } else {
-//           done()
-//         }
-//       })
+          node.client = client
+        })
   
-//       // check for registered nodes using configuration
-//       node.registeredNodeList = {}
+        registerEvents()
+      }
   
-//       // trick used to not start client if there are not nodes using this client
-//       node.register = function (nodeToRegister) {
-//         node.registeredNodeList[nodeToRegister.id] = nodeToRegister
-//         if (Object.keys(node.registeredNodeList).length === 1) {
-//           startClient()
-//             .catch((err) => {
-//               node.error('Error while starting Whatsapp client "' + config.session + '": ' + err.message)
-//               // retry
-//               setTimeout(node.register.bind(node, nodeToRegister), RETRY_TIMEOUT)
-//             })
-//         }
-//       }
+      node.on('input', function (msg) {
   
-//       node.restart = async function () {
-//         if (client) {
-//           await client.close()
-//           await startClient()
-//         }
-//       }
-//     }
+        if (msg.topic === 'restart') {
+          setStatus('warning', 'Authenticating...')
+          clientNode.restart()
+            .then(() => node.send({ topic: msg.topic, origin: msg, payload: [true] }, null))
+            .catch((err) => node.error('Error while restarting client ' + err.message))
+          return
+        }
   
-//     RED.nodes.registerType('whatsapp-receive', WhatsappClientReceive)
-//   }
+        if (!node.client) {
+          setStatus('error', 'Client not connected')
+          return
+        }
+  
+        if (typeof node.client[msg.topic] === 'function') {
+          if (msg.topic === 'onParticipantsChanged' || msg.topic === 'onLiveLocation') {
+            const chatId = msg.payload[0]
+            // register for chat event
+            node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
+          } else {
+            node.client[msg.topic](...msg.payload).then((...args) => {
+              node.send({
+                topic: msg.topic,
+                payload: args,
+                origin: msg
+              }, null)
+            }).catch(err => {
+              node.error('Requested api "' + msg.topic + '" ' + err.message)
+            })
+          }
+        } else {
+          node.error('Requested api "' + msg.topic + '" doesn\'t exists')
+        }
+      })
+  
+      // Set node status
+      function setStatus (type, message) {
+        const types = { info: 'blue', error: 'red', warning: 'yellow', success: 'green' }
+  
+        node.status({
+          fill: types[type] || 'grey',
+          shape: 'dot',
+          text: message
+        })
+      }
+    }
+  
+    RED.nodes.registerType('whatsapp-receive', WhatsappBotReceive)
+  }
   

@@ -22,7 +22,8 @@
     "nodes": {
       "whatsapp-client": "client.js",
       "whatsapp-bot": "bot.js",
-      "message-send": "send.js"
+      "message-send": "send.js",
+      "message-receive": "receive.js"
     }
   },
   "author": "Shubham Mishra",

@@ -9,6 +9,10 @@ module.exports = function (RED) {
         node.sendTo = config.sendTo
         node.messageContent = config.messageContent
 
+        console.log(node.name);
+        console.log(node.sendTo);
+        console.log(node.messageContent);
+
         const SOCKETS_STATE = {
             OPENING: 'info',
             PAIRING: 'info',
@@ -63,15 +67,15 @@ module.exports = function (RED) {
 
         node.on('input', function (msg) {
 
-        // if (msg.topic === 'restart') {
-        //   setStatus('warning', 'Authenticating...')
-        //   clientNode.restart()
-        //     .then(() => node.send({ topic: msg.topic, origin: msg, payload: [true] }))
-        //     .catch((err) => node.error('Error while restarting client ' + err.message))
-        //   return
-        // }
-  
-        if (!node.client) {
+            // if (msg.topic === 'restart') {
+            //   setStatus('warning', 'Authenticating...')
+            //   clientNode.restart()
+            //     .then(() => node.send({ topic: msg.topic, origin: msg, payload: [true] }))
+            //     .catch((err) => node.error('Error while restarting client ' + err.message))
+            //   return
+            // }
+
+            if (!node.client) {
                 setStatus('error', 'Client not connected')
                 return
             }
