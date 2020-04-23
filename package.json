@@ -20,7 +20,7 @@
   ],
   "node-red": {
     "nodes": {
-      "whatsapp-client": "client.js",
+      "whatsapp-session": "session.js",
       "whatsapp-bot": "bot.js",
       "message-send": "send.js",
       "message-receive": "receive.js"

@@ -6,16 +6,8 @@
       name: {
         value: ''
       },
-      sendTo: {
-          value: 0,
-          required: true,
-          validate:RED.validators.regex(/^\d{10}/)
-      },
-      messageContent : {
-          value:""
-      },
       client: {
-        type: 'whatsapp-client',
+        type: 'whatsapp-session',
         required: true
       }
     },

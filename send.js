@@ -6,12 +6,8 @@ module.exports = function (RED) {
 
         const node = this
         node.name = config.name
-        node.sendTo = config.sendTo
-        node.messageContent = config.messageContent
 
         console.log(node.name);
-        console.log(node.sendTo);
-        console.log(node.messageContent);
 
         const SOCKETS_STATE = {
             OPENING: 'info',
@@ -67,51 +63,31 @@ module.exports = function (RED) {
 
         node.on('input', function (msg) {
 
-            // if (msg.topic === 'restart') {
-            //   setStatus('warning', 'Authenticating...')
-            //   clientNode.restart()
-            //     .then(() => node.send({ topic: msg.topic, origin: msg, payload: [true] }))
-            //     .catch((err) => node.error('Error while restarting client ' + err.message))
-            //   return
-            // }
+            if (msg.topic === 'restart') {
+                setStatus('warning', 'Authenticating...')
+                clientNode.restart()
+                    .then(() => node.send({ topic: msg.topic, origin: msg, payload: [true] }))
+                    .catch((err) => node.error('Error while restarting client ' + err.message))
+                return
+            }
 
             if (!node.client) {
                 setStatus('error', 'Client not connected')
                 return
             }
 
-            if (RED.validators.regex(/^\d{10}/)) {
-                const chatId = node.sendTo.toString() + "@c.us"
-                node.client["sendText"](node.messageContent).then((...args) => {
+
+            if (msg.messageContent.length > 0) {
+                node.client["sendText"](...msg.payload).then((...args) => {
                     node.send({
-                        topic: msg.topic,
+                        topic: "sendText",
                         payload: args,
                         origin: msg
                     })
                 }).catch(err => {
                     node.error('Requested api "' + msg.topic + '" ' + err.message)
-                });
+                })
             }
-
-            //     if (typeof node.client[msg.topic] === 'function') {
-            //       if (msg.topic === 'onParticipantsChanged' || msg.topic === 'onLiveLocation') {
-            //         const chatId = msg.payload[0]
-            //         // register for chat event
-            //         node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
-            //       } else {
-            //         node.client[msg.topic](...msg.payload).then((...args) => {
-            //           node.send({
-            //             topic: msg.topic,
-            //             payload: args,
-            //             origin: msg
-            //           })
-            //         }).catch(err => {
-            //           node.error('Requested api "' + msg.topic + '" ' + err.message)
-            //         })
-            //       }
-            //     } else {
-            //       node.error('Requested api "' + msg.topic + '" doesn\'t exists')
-            //     }
         })
 
         // Set node status

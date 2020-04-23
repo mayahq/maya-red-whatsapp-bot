@@ -26,14 +26,14 @@ module.exports = function (RED) {
   
       function registerEvents () {
         clientNode.on('stateChange', onStateChange.bind(node))
-        clientNode.on('clientEvent', onClientEvent.bind(node))
+        clientNode.on('onMessage', onMessage.bind(node))
       }
   
       function onStateChange (socketState) {
         setStatus(SOCKETS_STATE[socketState], 'Socket: ' + socketState)
       }
   
-      function onClientEvent (eventName, ...args) {
+      function onMessage (eventName, ...args) {
         node.send([{ topic: eventName, payload: args }, null])
       }
   
@@ -75,6 +75,7 @@ module.exports = function (RED) {
         }
   
         if (typeof node.client[msg.topic] === 'function') {
+          console.log("something is happening")
           if (msg.topic === 'onParticipantsChanged' || msg.topic === 'onLiveLocation') {
             const chatId = msg.payload[0]
             // register for chat event
