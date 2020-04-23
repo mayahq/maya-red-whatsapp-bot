@@ -5,23 +5,17 @@ module.exports = function (RED) {
   
     const RETRY_TIMEOUT = 10000
   
-    // const EVENTS = [
-    //   'onMessage',
-    //   'onAck',
-    //   'onAddedToGroup'
-    // ]
-  
     function WhatsappSession (config) {
       RED.nodes.createNode(this, config)
       const node = this
   
       var client = null
   
-    //   function registerEvents () {
-    //     for (const event of EVENTS) {
-    //       client[event](onEvent.bind(node, event))
-    //     }
-    //   }
+      function registerEvents (EVENTS) {
+        for (const event of EVENTS) {
+          client[event](onEvent.bind(node, event))
+        }
+      }
   
       function onEvent (eventName, ...args) {
         node.emit('clientEvent', eventName, ...args)
@@ -44,8 +38,6 @@ module.exports = function (RED) {
   
           node.emit('stateChange', state)
         })
-  
-        // registerEvents()
         node.emit('ready', client)
       }
   
@@ -64,10 +56,15 @@ module.exports = function (RED) {
       node.registeredNodeList = {}
   
       // trick used to not start client if there are not nodes using this client
-      node.register = function (nodeToRegister) {
+      node.register = function (nodeToRegister, events) {
         node.registeredNodeList[nodeToRegister.id] = nodeToRegister
         if (Object.keys(node.registeredNodeList).length === 1) {
           startClient()
+            .then(()=>{
+                console.log(events)
+                registerEvents(events)
+            }
+            )
             .catch((err) => {
               node.error('Error while starting Whatsapp client "' + config.session + '": ' + err.message)
               // retry

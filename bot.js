@@ -23,6 +23,7 @@ module.exports = function (RED) {
     }
 
     const clientNode = RED.nodes.getNode(config.client)
+    console.log(clientNode);
 
     function registerEvents () {
       clientNode.on('stateChange', onStateChange.bind(node))
