@@ -1,0 +1,33 @@
+<script type="text/javascript">
+  RED.nodes.registerType('whatsapp-ack', {
+    category: 'Whatsapp Bot',
+    color: '#25D366',
+    defaults: {
+      name: {
+        value: ''
+      },
+      client: {
+        type: 'whatsapp-session',
+        required: true
+      },
+    },
+    inputs: 0,
+    outputs: 2,
+    icon: 'whatsapp.png',
+    paletteLabel: 'Whatsapp Acknowledge',
+    label: function () {
+      return this.name || 'Whatsapp Acknowledge';
+    }
+  });
+</script>
+
+<script type="text/html" data-template-name="whatsapp-ack">
+  <div class="form-row">
+    <label for="node-input-client"><i class="icon-globe"></i> <span> Client</span></label>
+    <input type="text" id="node-input-client">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>

@@ -1,8 +1,6 @@
 module.exports = function (RED) {
   'use strict'
 
-
-
   function WhatsappBotReceive(config) {
 
     RED.nodes.createNode(this, config)
@@ -26,7 +24,6 @@ module.exports = function (RED) {
     }
 
     const clientNode = RED.nodes.getNode(config.client)
-    console.log(clientNode);
 
     function registerEvents () {
       clientNode.on('stateChange', onStateChange.bind(node))
@@ -56,7 +53,6 @@ module.exports = function (RED) {
 
       clientNode.on('ready', function (client) {
         setStatus('success', 'Connected')
-
         node.client = client
       })
 
@@ -64,8 +60,6 @@ module.exports = function (RED) {
     }
 
     node.on('input', function (msg) {
-
-      console.log("something received")
 
       if (msg.topic === 'restart') {
         setStatus('warning', 'Authenticating...')
