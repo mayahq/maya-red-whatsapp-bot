@@ -54,30 +54,30 @@ module.exports = function (RED) {
 
         // check for registered nodes using configuration
         node.registeredNodeList = {}
+        node.sessionNodes = 0
 
         // trick used to not start client if there are not nodes using this client
         node.register = function (nodeToRegister, events) {
             node.registeredNodeList[nodeToRegister.id] = nodeToRegister
-            if (Object.keys(node.registeredNodeList).length === 1) {
+            if (nodeToRegister.type === 'whatsapp-start') {
+                console.log("Register Start Node")
+                console.log(nodeToRegister)
                 startClient()
-                    .then(() => {
-                        registerEvents(nodeToRegister, events)
-                    }
-                    )
                     .catch((err) => {
                         node.error('Error while starting Whatsapp client "' + config.session + '": ' + err.message)
                         // retry
                         setTimeout(node.register.bind(node, nodeToRegister, events), RETRY_TIMEOUT)
                     })
-            } else if (Object.keys(node.registeredNodeList).length > 1) {
+            } else if (Object.keys(node.registeredNodeList).length > 1 && events !== null) {
                 function registerEventAtClientReady() {
-                    if (!client) {//we want it to match
-                        setTimeout(registerEventAtClientReady, 2000);//wait 50 millisecnds then recheck
+                    if (!client) {
+                        setTimeout(registerEventAtClientReady, 2000); 
+                        node.emit('Client Not Ready')
                         return;
+                    } else {
+                        console.log(events)
+                        registerEvents(nodeToRegister, events)
                     }
-                    console.log(events)
-                    registerEvents(nodeToRegister, events)
-                    //real action
                 }
                 registerEventAtClientReady();
             }

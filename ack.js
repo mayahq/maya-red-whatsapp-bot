@@ -7,7 +7,7 @@ module.exports = function (RED) {
   
       const node = this
       node.name = config.name
-  
+
       const SOCKETS_STATE = {
         OPENING: 'info',
         PAIRING: 'info',
