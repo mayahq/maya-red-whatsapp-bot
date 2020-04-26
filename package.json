@@ -1,5 +1,5 @@
 {
-  "name": "node-red-contrib-whatsappbot",
+  "name": "maya-red-whatsappbot",
   "version": "0.0.7",
   "description": "Whatsapp Bot for Maya",
   "main": "index.js",
@@ -24,7 +24,7 @@
       "message-receive": "receive.js",
       "message-ack": "ack.js",
       "whatsapp-start": "start.js",
-      "whatsapp-reply":"reply.js"
+      "whatsapp-reply": "reply.js"
     }
   },
   "author": "Shubham Mishra",

@@ -9,7 +9,6 @@ module.exports = function (RED) {
         
         RED.nodes.createNode(this, config)
         const node = this
-        console.log(RED.nodes.getNode())
         var client = null
 
         function registerEvents(n, EVENTS) {
