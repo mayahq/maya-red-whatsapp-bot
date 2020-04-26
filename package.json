@@ -21,10 +21,10 @@
   "node-red": {
     "nodes": {
       "whatsapp-session": "session.js",
-      "message-send": "send.js",
       "message-receive": "receive.js",
       "message-ack": "ack.js",
-      "whatsapp-start": "start.js"
+      "whatsapp-start": "start.js",
+      "whatsapp-reply":"reply.js"
     }
   },
   "author": "Shubham Mishra",

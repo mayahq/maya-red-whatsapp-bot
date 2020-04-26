@@ -2,10 +2,12 @@ module.exports = function (RED) {
     'use strict'
   
     function WhatsappStart (config) {
+      
       RED.nodes.createNode(this, config)
   
       const node = this
       node.name = config.name
+      // node.start = config.startup
   
       const SOCKETS_STATE = {
         OPENING: 'info',
@@ -26,7 +28,6 @@ module.exports = function (RED) {
   
       function registerEvents () {
         clientNode.on('stateChange', onStateChange.bind(node))
-        clientNode.on('clientEvent', onClientEvent.bind(node))
       }
   
       function onStateChange (socketState) {

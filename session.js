@@ -6,9 +6,10 @@ module.exports = function (RED) {
     const RETRY_TIMEOUT = 10000
 
     function WhatsappSession(config) {
+        
         RED.nodes.createNode(this, config)
         const node = this
-
+        console.log(RED.nodes.getNode())
         var client = null
 
         function registerEvents(n, EVENTS) {
