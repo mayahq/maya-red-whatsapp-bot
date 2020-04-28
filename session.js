@@ -15,6 +15,7 @@ module.exports = function (RED) {
             for (const event of EVENTS) {
                 client[event](onEvent.bind(n, event))
             }
+            console.log(client);
         }
 
         function onEvent(eventName, ...args) {
@@ -53,12 +54,14 @@ module.exports = function (RED) {
         })
 
         // check for registered nodes using configuration
+        // var registeredNodeType = new Set();
         node.registeredNodeList = {}
-        node.sessionNodes = 0
 
         // trick used to not start client if there are not nodes using this client
         node.register = function (nodeToRegister, events) {
-            node.registeredNodeList[nodeToRegister.id] = nodeToRegister
+            // registeredNodeList.add(nodeToRegister.type);
+            // node.registeredNodeTypes = registeredNodeList;
+            node.registeredNodeList[nodeToRegister.id] = nodeToRegister;
             if (nodeToRegister.type === 'whatsapp-start') {
                 console.log("Register Start Node")
                 console.log(nodeToRegister)
@@ -68,11 +71,14 @@ module.exports = function (RED) {
                         // retry
                         setTimeout(node.register.bind(node, nodeToRegister, events), RETRY_TIMEOUT)
                     })
-            } else if (Object.keys(node.registeredNodeList).length > 1 && events !== null) {
+            } else if (events !== null) {
+                console.log("subscribing to events ", events)
+                console.log("client status: ", client)
                 function registerEventAtClientReady() {
                     if (!client) {
+                        console.log("trying to register again..")
                         setTimeout(registerEventAtClientReady, 2000); 
-                        node.emit('Client Not Ready')
+                        // node.emit('error', 'Client Not Ready')
                         return;
                     } else {
                         console.log(events)
@@ -87,6 +93,14 @@ module.exports = function (RED) {
             if (client) {
                 await client.close()
                 await startClient()
+            }
+        }
+
+        node.close = async function () {
+            if(client){
+                await client.close();
+                node.emit('stateChange', 'MANUAL_DISCONNECT');
+                // registeredNodeType.clear();
             }
         }
     }
