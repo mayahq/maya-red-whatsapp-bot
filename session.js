@@ -15,7 +15,6 @@ module.exports = function (RED) {
             for (const event of EVENTS) {
                 client[event](onEvent.bind(n, event))
             }
-            console.log(client);
         }
 
         function onEvent(eventName, ...args) {
@@ -76,7 +75,7 @@ module.exports = function (RED) {
                 console.log("client status: ", client)
                 function registerEventAtClientReady() {
                     if (!client) {
-                        console.log("trying to register again..")
+                        console.log("trying to register again..", nodeToRegister.type)
                         setTimeout(registerEventAtClientReady, 2000); 
                         // node.emit('error', 'Client Not Ready')
                         return;
@@ -101,6 +100,13 @@ module.exports = function (RED) {
                 await client.close();
                 node.emit('stateChange', 'MANUAL_DISCONNECT');
                 // registeredNodeType.clear();
+            }
+        }
+
+        node.setNull = async function () {
+            if(client) {
+                client = null;
+                node.emit('stateChange', 'DISCONNECTED')
             }
         }
     }

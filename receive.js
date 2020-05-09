@@ -115,7 +115,7 @@ module.exports = function (RED) {
         const newClientNode = RED.nodes.getNode(config.client)
 
         console.log("Register after disconnect")
-        // registerNodeToClient(node, newClientNode);
+        registerNodeToClient(node, newClientNode);
       }
 
       node.status({
