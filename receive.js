@@ -20,22 +20,21 @@ module.exports = function (RED) {
       PROXYBLOCK: 'error',
       TOS_BLOCK: 'error',
       SMB_TOS_BLOCK: 'error',
-      DEPRECATED_VERSION: 'error',
-      MANUAL_DISCONNECT: 'manual'
+      DEPRECATED_VERSION: 'error'
     }
 
     const clientNode = RED.nodes.getNode(config.client)
 
-    function registerEvents() {
+    function registerEvents () {
       clientNode.on('stateChange', onStateChange.bind(node))
       clientNode.on('clientEvent', onClientEvent.bind(node))
     }
 
-    function onStateChange(socketState) {
+    function onStateChange (socketState) {
       setStatus(SOCKETS_STATE[socketState], 'Socket: ' + socketState)
     }
 
-    function onClientEvent(eventName, ...args) {
+    function onClientEvent (eventName, ...args) {
       node.send({ topic: eventName, payload: args })
     }
 
@@ -43,28 +42,22 @@ module.exports = function (RED) {
       node.send([{ topic: event, chatId: chatId, args: args }, null])
     }
 
-    async function registerNodeToClient(node, clientNode) {
+    if (clientNode) {
+      clientNode.register(node, ['onMessage'])
 
-      if (clientNode) {
+      setStatus('warning', 'Authenticating...')
 
-        await clientNode.register(node, ['onMessage'])
+      clientNode.on('qrCode', function (qrCode) {
+        node.send([null, { topic: 'qrCode', payload: [qrCode] }])
+      })
 
-        setStatus('warning', 'Authenticating...')
+      clientNode.on('ready', function (client) {
+        setStatus('success', 'Connected')
+        node.client = client
+      })
 
-        clientNode.on('qrCode', function (qrCode) {
-          node.send([null, { topic: 'qrCode', payload: [qrCode] }])
-        })
-
-        clientNode.on('ready', function (client) {
-          setStatus('success', 'Connected')
-          node.client = client
-        })
-
-        registerEvents();
-      }
+      registerEvents();
     }
-
-    registerNodeToClient(node, clientNode);
 
     node.on('input', function (msg) {
 
@@ -107,25 +100,17 @@ module.exports = function (RED) {
       return
     }
 
-    // Set node status
-    function setStatus(type, message) {
-      console.log(type);
-      const types = { info: 'blue', error: 'red', warning: 'yellow', success: 'green', manual: 'orange' }
-      if (type === 'manual') {
-        const newClientNode = RED.nodes.getNode(config.client)
+  // Set node status
+  function setStatus(type, message) {
+    const types = { info: 'blue', error: 'red', warning: 'yellow', success: 'green' }
 
-        console.log("Register after disconnect")
-        // registerNodeToClient(node, newClientNode);
-      }
-
-      node.status({
-        fill: types[type] || 'grey',
-        shape: 'dot',
-        text: message
-      })
-    }
-
+    node.status({
+      fill: types[type] || 'grey',
+      shape: 'dot',
+      text: message
+    })
   }
+}
 
-  RED.nodes.registerType('whatsapp-receive', WhatsappBotReceive)
+RED.nodes.registerType('whatsapp-receive', WhatsappBotReceive)
 }
