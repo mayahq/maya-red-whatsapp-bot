@@ -24,16 +24,17 @@
       "message-receive": "receive.js",
       "message-ack": "ack.js",
       "whatsapp-start": "start.js",
-      "whatsapp-reply": "reply.js"
+      "whatsapp-text": "text.js",
+      "whatsapp-file": "file.js"
     }
   },
   "author": "Shubham Mishra",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/robertsLando/node-red-contrib-whatsappbot/issues"
+    "url": "https://github.com/mayahq/maya-red-whatsappbot/issues"
   },
-  "homepage": "https://getmaya.co",
+  "homepage": "https://mayahq.com",
   "dependencies": {
-    "sulla": "^2.3.14"
+    "@open-wa/wa-automate": "^2.0.22"
   }
 }

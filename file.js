@@ -1,7 +1,7 @@
 module.exports = function (RED) {
     'use strict'
   
-    function WhatsappReply (config) {
+    function WhatsappFile (config) {
       RED.nodes.createNode(this, config)
   
       const node = this
@@ -21,8 +21,8 @@ module.exports = function (RED) {
         SMB_TOS_BLOCK: 'error',
         DEPRECATED_VERSION: 'error'
       }
-  
-      const clientNode = RED.nodes.getNode(config.client)
+      var globalSession = this.context().global
+      const clientNode = RED.nodes.getNode(globalSession.get("globalSession").client)
   
       function registerEvents () {
         clientNode.on('stateChange', onStateChange.bind(node))
@@ -80,9 +80,9 @@ module.exports = function (RED) {
             // register for chat event
             node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
           } else if (config.engage){
-            node.client["sendText"](msg.chatId, msg.payload).then((...args) => {
+            node.client["sendFile"](msg.chatId, msg.payload.filepath, msg.payload.filename, msg.payload.caption).then((...args) => {
               node.send({
-                topic: "sendText",
+                topic: "sendFile",
                 payload: args,
                 origin: msg
               })
@@ -90,7 +90,7 @@ module.exports = function (RED) {
               node.error('Requested api "' + msg.topic + '" ' + err.message)
             })
           }
-        } else if(mgs.topic === null || msg.topic === ''){
+        } else if(msg.topic === null || msg.topic === ''){
           node.error('Requested api "' + msg.topic + '" doesn\'t exists')
         } else {
             node.send({
@@ -113,6 +113,6 @@ module.exports = function (RED) {
       }
     }
   
-    RED.nodes.registerType('whatsapp-reply', WhatsappReply)
+    RED.nodes.registerType('whatsapp-file', WhatsappFile)
   }
   
