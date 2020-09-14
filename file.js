@@ -80,7 +80,7 @@ module.exports = function (RED) {
             // register for chat event
             node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
           } else if (config.engage){
-            node.client["sendFile"](msg.chatId, msg.payload.filepath, msg.payload.filename, msg.payload.caption).then((...args) => {
+            node.client["sendFile"](msg.chatId, msg.filepath, msg.filename, msg.caption).then((...args) => {
               node.send({
                 topic: "sendFile",
                 payload: args,

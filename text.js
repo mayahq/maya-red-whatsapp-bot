@@ -80,7 +80,7 @@ module.exports = function (RED) {
             // register for chat event
             node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
           } else if (config.engage){
-            node.client["sendText"](msg.chatId, msg.payload).then((...args) => {
+            node.client["sendText"](msg.chatId, msg.content).then((...args) => {
               node.send({
                 topic: "sendText",
                 payload: args,
