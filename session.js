@@ -4,8 +4,8 @@ module.exports = function (RED) {
     const { create, ev } = require('@open-wa/wa-automate');
     const patch = require('./patch');
 
-    const RETRY_TIMEOUT = 10000
-    var RETRIES = 0;
+    const RETRY_TIMEOUT = 10000;
+    let RETRIES = 0;
 
     function WhatsappSession(config) {
         
@@ -48,8 +48,8 @@ module.exports = function (RED) {
 
         node.on('close', function (done) {
             if (client) {
-                client.close
-                    .catch((err) => {
+                client.close()
+                    .catch((err) => {close
                         node.error('Error while closing Whatsapp client "' + config.session + '": ' + err.message)
                     }).finally(() => done())
             } else {

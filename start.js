@@ -5,13 +5,13 @@ module.exports = function (RED) {
 
     RED.nodes.createNode(this, config);
     var globalSession = this.context().global;
-    globalSession.set("globalSession", config);
-    console.log(globalSession.get("globalSession"));
+    // globalSession.set("globalSession", config);
+    // console.log(globalSession.get("globalSession"));
     this.client = config.client;
     var node = this;
     async function clientStateChange(node, start) {
 
-      const clientNode = RED.nodes.getNode(node.client)
+      const clientNode = RED.nodes.getNode(node.client);
       // Set node status
       function setStatus(type, message) {
         const types = { info: 'blue', error: 'red', warning: 'yellow', success: 'green' }
@@ -60,17 +60,15 @@ module.exports = function (RED) {
           clientNode.on('ready', function (client) {
             setStatus('success', 'Connected')
 
-            node.client = client
+            node.session = client
           })
 
           registerEvents()
           return node.client
 
         } else {
-          console.log("trying to close session")
           clientNode.close();
           setStatus('error', 'Client disconnected')
-          return globalConfig.client;
         }
       }
     }
@@ -82,7 +80,7 @@ module.exports = function (RED) {
         console.log(msg)
         clientStateChange(node, true);
       } else if (msg.whatsapp === "stop") {
-        clientStateChange(node, false)
+        clientStateChange(node, false);
       }
 
     });
