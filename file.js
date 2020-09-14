@@ -21,8 +21,7 @@ module.exports = function (RED) {
         SMB_TOS_BLOCK: 'error',
         DEPRECATED_VERSION: 'error'
       }
-      var globalSession = this.context().global
-      const clientNode = RED.nodes.getNode(globalSession.get("globalSession").client)
+      const clientNode = RED.nodes.getNode(config.client)
   
       function registerEvents () {
         clientNode.on('stateChange', onStateChange.bind(node))
@@ -79,7 +78,7 @@ module.exports = function (RED) {
             const chatId = msg.payload[0]
             // register for chat event
             node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
-          } else if (config.engage){
+          } else {
             node.client["sendFile"](msg.chatId, msg.filepath, msg.filename, msg.caption).then((...args) => {
               node.send({
                 topic: "sendFile",

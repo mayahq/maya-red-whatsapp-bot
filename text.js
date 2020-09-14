@@ -21,8 +21,7 @@ module.exports = function (RED) {
         SMB_TOS_BLOCK: 'error',
         DEPRECATED_VERSION: 'error'
       }
-      var globalSession = this.context().global
-      const clientNode = RED.nodes.getNode(globalSession.get("globalSession").client)
+      const clientNode = RED.nodes.getNode(config.client)
   
       function registerEvents () {
         clientNode.on('stateChange', onStateChange.bind(node))
@@ -73,13 +72,14 @@ module.exports = function (RED) {
           setStatus('error', 'Client not connected')
           return
         }
-  
+        console.log(typeof node.client[msg.topic]);
         if (typeof node.client[msg.topic] === 'function') {
           if (msg.topic === 'onParticipantsChanged' || msg.topic === 'onLiveLocation') {
             const chatId = msg.payload[0]
             // register for chat event
             node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
-          } else if (config.engage){
+          } else {
+            console.log("reached this part of code")
             node.client["sendText"](msg.chatId, msg.content).then((...args) => {
               node.send({
                 topic: "sendText",
