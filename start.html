@@ -14,42 +14,7 @@
         required: true
       },
     },
-    button: {
-			enabled: function() {
-				return !this.changed
-			},
-      toggle: 'active',
-			onclick: function() {
-				if (this.changed) {
-					return RED.notify(RED._("notification.warning", {message:RED._("notification.warnings.undeployedChanges")}),"warning");
-				}
-				var label = (this.name||"whatsapp-start");      
-				var node = this;
-
-        console.log(this.active)
-        
-				$.ajax({
-					url: "whatsapp-start/"+this.id,
-					type:"POST",
-          data: {active: this.active},
-					success: function(resp) {
-						RED.notify(node._("whatsapp-start.success",{label:label}),"success");
-					},
-					error: function(jqXHR,textStatus,errorThrown) {
-						if (jqXHR.status == 404) {
-							RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.not-deployed")}),"error");
-						} else if (jqXHR.status == 500) {
-							RED.notify(node._("common.notification.error",{message:node._("inject.errors.failed")}),"error");
-						} else if (jqXHR.status == 0) {
-							RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.no-response")}),"error");
-						} else {
-							RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.unexpected",{status:jqXHR.status,message:textStatus})}),"error");
-						}
-					}
-				});
-			}
-		},
-    inputs: 0,
+    inputs: 1,
     outputs: 1,
     align: "left",
     icon: 'whatsapp.png',

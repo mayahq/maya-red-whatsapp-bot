@@ -1,5 +1,5 @@
 <script type="text/javascript">
-  RED.nodes.registerType('whatsapp-reply', {
+  RED.nodes.registerType('whatsapp-file', {
     category: 'Whatsapp Bot',
     color: '#25D366',
     defaults: {
@@ -18,15 +18,15 @@
     outputs: 1,
     align: "left",
     icon: 'whatsapp.png',
-    paletteLabel: 'Whatsapp Reply',
+    paletteLabel: 'Whatsapp Send File',
     label: function () {
-      return this.name || 'Whatsapp Reply'
+      return this.name || 'Whatsapp Send File'
     }
   })
 </script>
 
 
-<script type="text/html" data-template-name="whatsapp-reply">
+<script type="text/html" data-template-name="whatsapp-file">
   <div class="form-row">
     <label for="node-input-client"><i class="icon-globe"></i> <span> Client</span></label>
     <input type="text" id="node-input-client">
@@ -41,7 +41,7 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="whatsapp-bot">
+<script type="text/html" data-help-name="whatsapp-file">
   <p>Used to send/receive data from a Whatsapp Client. Each Bot node by default subscribes to <code>onMessage</code>, <code>onAck</code> and <code>onAddedToGroup</code> events</p>
   
   <h3>Input</h3>

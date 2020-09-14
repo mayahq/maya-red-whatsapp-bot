@@ -1,9 +1,11 @@
 module.exports = function (RED) {
     'use strict'
 
-    const { create } = require('sulla')
+    const { create, ev } = require('@open-wa/wa-automate');
+    const patch = require('./patch');
 
     const RETRY_TIMEOUT = 10000
+    var RETRIES = 0;
 
     function WhatsappSession(config) {
         
@@ -26,16 +28,19 @@ module.exports = function (RED) {
         }
 
         async function startClient() {
-            client = await create(config.session, onQrCode, {
+            ev.on(`qr.${config.session}`, onQrCode)
+            client = await create({
+                sessionId: config.session,
                 headless: config.headless,
                 devtools: config.devtools
-            })
+            });
 
-            client.onStateChange((state) => {
-                if (state === 'UNLAUNCHED') {
-                    client.useHere()
+            patch(client)
+
+            client.onStateChanged((state) => {
+                if (state === 'CONFLICT') {
+                    client.forceReFocus()
                 }
-
                 node.emit('stateChange', state)
             })
             node.emit('ready', client)
@@ -63,12 +68,18 @@ module.exports = function (RED) {
             node.registeredNodeList[nodeToRegister.id] = nodeToRegister;
             if (nodeToRegister.type === 'whatsapp-start') {
                 console.log("Register Start Node")
-                console.log(nodeToRegister)
                 startClient()
                     .catch((err) => {
                         node.error('Error while starting Whatsapp client "' + config.session + '": ' + err.message)
                         // retry
-                        setTimeout(node.register.bind(node, nodeToRegister, events), RETRY_TIMEOUT)
+                        if(RETRIES < 3){
+                            RETRIES++;
+                            setTimeout(node.register.bind(node, nodeToRegister, events), RETRY_TIMEOUT)
+                        } else {
+                            RETRIES = 0;
+                            node.emit('stateChange', "TIMEOUT");
+                        }
+                        
                     })
             } else if (events !== null) {
                 console.log("subscribing to events ", events)
@@ -90,14 +101,14 @@ module.exports = function (RED) {
 
         node.restart = async function () {
             if (client) {
-                await client.close()
+                await client.kill()
                 await startClient()
             }
         }
 
         node.close = async function () {
             if(client){
-                await client.close();
+                await client.kill();
                 node.emit('stateChange', 'MANUAL_DISCONNECT');
                 // registeredNodeType.clear();
             }
