@@ -25,7 +25,8 @@
       "message-ack": "ack.js",
       "whatsapp-start": "start.js",
       "whatsapp-text": "text.js",
-      "whatsapp-file": "file.js"
+      "whatsapp-file": "file.js",
+      "create-group":"createGroup.js"
     }
   },
   "author": "Shubham Mishra",
