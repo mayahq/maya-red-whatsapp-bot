@@ -2,7 +2,7 @@ module.exports = function (RED) {
     'use strict'
 
     const { create, ev } = require('@mayahq/waborn');
-    const patch = require('./patch');
+    // const patch = require('./patch');
 
     const RETRY_TIMEOUT = 10000;
     let RETRIES = 0;
@@ -35,7 +35,7 @@ module.exports = function (RED) {
                 devtools: config.devtools
             });
 
-            patch(client)
+            // patch(client)
 
             client.onStateChanged((state) => {
                 if (state === 'CONFLICT') {
