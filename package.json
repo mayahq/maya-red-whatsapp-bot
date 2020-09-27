@@ -35,6 +35,6 @@
   },
   "homepage": "https://mayahq.com",
   "dependencies": {
-    "@open-wa/wa-automate": "^2.0.22"
+    "@mayahq/waborn": "1.0.0"
   }
 }

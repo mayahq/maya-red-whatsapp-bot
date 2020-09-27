@@ -1,7 +1,7 @@
 module.exports = function (RED) {
     'use strict'
 
-    const { create, ev } = require('@open-wa/wa-automate');
+    const { create, ev } = require('@mayahq/waborn');
     const patch = require('./patch');
 
     const RETRY_TIMEOUT = 10000;
