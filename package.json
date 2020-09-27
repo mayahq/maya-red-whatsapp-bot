@@ -35,6 +35,6 @@
   },
   "homepage": "https://mayahq.com",
   "dependencies": {
-    "@mayahq/waborn": "1.0.0"
+    "@mayahq/waborn": "1.0.1"
   }
 }
