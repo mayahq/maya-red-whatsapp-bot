@@ -8,15 +8,18 @@ module.exports = function (RED) {
     let RETRIES = 0;
 
     function WhatsappSession(config) {
-        
+
         RED.nodes.createNode(this, config)
         const node = this
         var client = null
 
         function registerEvents(n, EVENTS) {
-            for (const event of EVENTS) {
-                client[event](onEvent.bind(n, event))
+            if (client) {
+                for (const event of EVENTS) {
+                    client[event](onEvent.bind(n, event))
+                }
             }
+
         }
 
         function onEvent(eventName, ...args) {
@@ -25,6 +28,10 @@ module.exports = function (RED) {
 
         function onQrCode(qrCode) {
             node.emit('qrCode', qrCode)
+        }
+
+        async function getClient() {
+            return await client;
         }
 
         async function startClient() {
@@ -49,7 +56,8 @@ module.exports = function (RED) {
         node.on('close', function (done) {
             if (client) {
                 client.close()
-                    .catch((err) => {close
+                    .catch((err) => {
+                        close
                         node.error('Error while closing Whatsapp client "' + config.session + '": ' + err.message)
                     }).finally(() => done())
             } else {
@@ -72,14 +80,14 @@ module.exports = function (RED) {
                     .catch((err) => {
                         node.error('Error while starting Whatsapp client "' + config.session + '": ' + err.message)
                         // retry
-                        if(RETRIES < 3){
+                        if (RETRIES < 3) {
                             RETRIES++;
                             setTimeout(node.register.bind(node, nodeToRegister, events), RETRY_TIMEOUT)
                         } else {
                             RETRIES = 0;
                             node.emit('stateChange', "TIMEOUT");
                         }
-                        
+
                     })
             } else if (events !== null) {
                 console.log("subscribing to events ", events)
@@ -87,7 +95,7 @@ module.exports = function (RED) {
                 function registerEventAtClientReady() {
                     if (!client) {
                         console.log("trying to register again..", nodeToRegister.type)
-                        setTimeout(registerEventAtClientReady, 2000); 
+                        setTimeout(registerEventAtClientReady, 2000);
                         // node.emit('error', 'Client Not Ready')
                         return;
                     } else {
@@ -107,7 +115,7 @@ module.exports = function (RED) {
         }
 
         node.close = async function () {
-            if(client){
+            if (client) {
                 await client.kill();
                 node.emit('stateChange', 'MANUAL_DISCONNECT');
                 // registeredNodeType.clear();
@@ -115,7 +123,7 @@ module.exports = function (RED) {
         }
 
         node.setNull = async function () {
-            if(client) {
+            if (client) {
                 client = null;
                 node.emit('stateChange', 'DISCONNECTED')
             }
