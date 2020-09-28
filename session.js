@@ -97,10 +97,10 @@ module.exports = function (RED) {
                         console.log("trying to register again..", nodeToRegister.type)
                         setTimeout(registerEventAtClientReady, 2000);
                         // node.emit('error', 'Client Not Ready')
-                        return;
                     } else {
                         console.log(events)
                         registerEvents(nodeToRegister, events)
+                        return;
                     }
                 }
                 registerEventAtClientReady();
