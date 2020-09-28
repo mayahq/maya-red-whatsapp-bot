@@ -86,7 +86,7 @@ module.exports = function (RED) {
           const chatId = msg.payload[0]
           // register for chat event
           node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
-        } else {
+        } else if(msg.topic === "onMessage"){
           node.client[msg.topic](...msg.payload).then((...args) => {
             node.send({
               topic: msg.topic,

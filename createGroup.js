@@ -81,7 +81,7 @@ module.exports = function (RED) {
                     const chatId = msg.payload[0]
                     // register for chat event
                     node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
-                } else {
+                } else if (msg.topic === "createGroup"){
                     node.client["createGroup"](msg.groupName, msg.participants).then((...args) => {
                         node.send({
                             topic: "createGroup",
