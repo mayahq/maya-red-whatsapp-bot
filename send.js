@@ -44,7 +44,7 @@ module.exports = function (RED) {
         }
 
         if (clientNode) {
-            clientNode.register(node)
+            clientNode.register(node, null)
 
             setStatus('warning', 'Authenticating...')
 
