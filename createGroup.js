@@ -76,23 +76,24 @@ module.exports = function (RED) {
                 return
             }
 
-
-            if (msg.groupName.length > 0 && msg.participants.length > 0) {
-                node.client["createGroup"](msg.groupName, msg.participants).then((...args) => {
-                    node.send({
-                        topic: "createGroup",
-                        payload: args,
-                        origin: msg
+            if (typeof node.client[msg.topic] === 'function') {
+                if (msg.topic === 'onParticipantsChanged' || msg.topic === 'onLiveLocation') {
+                    const chatId = msg.payload[0]
+                    // register for chat event
+                    node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
+                } else {
+                    node.client["createGroup"](msg.groupName, msg.participants).then((...args) => {
+                        node.send({
+                            topic: "createGroup",
+                            payload: args,
+                            origin: msg
+                        })
+                    }).catch(err => {
+                        node.error('Requested api "' + msg.topic + '" ' + err.message)
                     })
-                }).catch(err => {
-                    node.error('Requested api "' + msg.topic + '" ' + err.message)
-                })
+                }
             } else {
-                node.send({
-                    topic: "createGroup",
-                    payload: "Group name and a minimum of 1 participant is required",
-                    origin: msg
-                });
+                node.error('Requested api "' + msg.topic + '" doesn\'t exists')
             }
         })
 
