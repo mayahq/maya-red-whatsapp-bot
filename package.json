@@ -1,6 +1,6 @@
 {
   "name": "maya-red-whatsappbot",
-  "version": "0.0.81",
+  "version": "0.0.82",
   "description": "Whatsapp Bot for Maya",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
       "whatsapp-start": "start.js",
       "whatsapp-text": "text.js",
       "whatsapp-file": "file.js",
-      "create-group":"createGroup.js"
+      "create-group": "createGroup.js"
     }
   },
   "author": "Shubham Mishra",
@@ -36,6 +36,6 @@
   },
   "homepage": "https://mayahq.com",
   "dependencies": {
-    "@mayahq/waborn": "1.0.1"
+    "@mayahq/waborn": "1.0.2"
   }
 }
