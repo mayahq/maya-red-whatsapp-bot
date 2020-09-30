@@ -1,6 +1,6 @@
 {
   "name": "maya-red-whatsappbot",
-  "version": "0.0.82",
+  "version": "0.1.1",
   "description": "Whatsapp Bot for Maya",
   "main": "index.js",
   "scripts": {

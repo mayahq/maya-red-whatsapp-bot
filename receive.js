@@ -26,7 +26,7 @@ module.exports = function (RED) {
 
     const clientNode = RED.nodes.getNode(config.client)
 
-    function registerEvents() {
+    function registerEvents(node) {
       clientNode.on('stateChange', onStateChange.bind(node))
       clientNode.on('clientEvent', onClientEvent.bind(node))
     }
@@ -43,28 +43,22 @@ module.exports = function (RED) {
       node.send([{ topic: event, chatId: chatId, args: args }, null])
     }
 
-    async function registerNodeToClient(node, clientNode) {
+    // async function registerNodeToClient(node, clientNode) {
 
-      if (clientNode) {
-
-        await clientNode.register(node, ['onMessage'])
-
-        setStatus('warning', 'Authenticating...')
-
-        clientNode.on('qrCode', function (qrCode) {
-          node.send([null, { topic: 'qrCode', payload: [qrCode] }])
-        })
-
-        clientNode.on('ready', function (client) {
-          setStatus('success', 'Connected')
-          node.client = client
-        })
-
-        registerEvents();
-      }
+    if (clientNode) {
+      // clientNode.on('qrCode', function (qrCode) {
+      //   node.send([null, { topic: 'qrCode', payload: [qrCode] }])
+      // })
+      setStatus('warning', 'Waiting for whatsapp client...')
+      clientNode.on('ready', function (client) {
+        clientNode.register(node, ['onMessage'])
+        setStatus('success', 'Connected')
+        node.client = client
+        registerEvents(node);
+      })
     }
-
-    registerNodeToClient(node, clientNode);
+    // }
+    // registerNodeToClient(node, clientNode);
 
     node.on('input', function (msg) {
 
@@ -86,7 +80,7 @@ module.exports = function (RED) {
           const chatId = msg.payload[0]
           // register for chat event
           node.client[msg.topic](chatId, onChatEvent.bind(node, msg.topic, chatId))
-        } else if(msg.topic === "onMessage"){
+        } else if (msg.topic === "onMessage") {
           node.client[msg.topic](...msg.payload).then((...args) => {
             node.send({
               topic: msg.topic,
