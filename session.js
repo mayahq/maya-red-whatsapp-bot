@@ -91,7 +91,6 @@ module.exports = function (RED) {
                     })
             } else if (events !== null) {
                 console.log("subscribing to events ", events)
-                console.log("client status: ", client)
                 function registerEventAtClientReady() {
                     if (!client) {
                         console.log("trying to register again..", nodeToRegister.type)
