@@ -1,7 +1,7 @@
 {
   "name": "maya-red-whatsappbot",
   "version": "0.1.1",
-  "description": "Whatsapp Bot for Maya",
+  "description": "Whatsapp module for Maya",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -36,6 +36,6 @@
   },
   "homepage": "https://mayahq.com",
   "dependencies": {
-    "@mayahq/waborn": "1.0.3"
+    "@mayahq/waborn": "1.0.4"
   }
 }
