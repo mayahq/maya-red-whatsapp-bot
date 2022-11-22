@@ -35,6 +35,6 @@
   },
   "homepage": "https://mayahq.com",
   "dependencies": {
-    "@open-wa/wa-automate": "^3.8.0"
+    "@open-wa/wa-automate": "^3.16.1"
   }
 }
